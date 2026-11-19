@@ -626,8 +626,10 @@ img { max-width: 100%; display: block; }
   overflow-y: auto;
   overflow-x: hidden;
   align-items: flex-start;
-  padding-top: 50px;
-  padding-bottom: 50px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  padding-left: 30px;
+  padding-right: 30px;
   height: 100vh;
 }
 
