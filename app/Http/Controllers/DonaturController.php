@@ -9,20 +9,12 @@ class DonaturController extends Controller
 {
     public function dashboard(Request $request)
     {
-        $donatur = $request->user();
-        $donations = $donatur->donasi()
-            ->with(['kampanye.panti'])
-            ->latest()
-            ->take(5)
-            ->get();
+        $donatur  = $request->user();
+        $donations = $donatur->donasi()->with(['kampanye.panti'])->latest()->take(5)->get();
+        $total    = $donatur->donasi()->where('status', 'verified')->sum('nominal');
+        $count    = $donatur->donasi()->where('status', 'verified')->count();
 
-        $verifiedDonations = $donatur->donasi()->where('status', 'verified');
-
-        return view('donatur.dashboard', [
-            'donations' => $donations,
-            'total' => (clone $verifiedDonations)->sum('nominal'),
-            'count' => $verifiedDonations->count(),
-        ]);
+        return view('donatur.dashboard', compact('donations', 'total', 'count'));
     }
 
     public function donations(Request $request)
@@ -32,8 +24,6 @@ class DonaturController extends Controller
             ->latest()
             ->paginate(12);
 
-        return view('donatur.donations', [
-            'donations' => $donations,
-        ]);
+        return view('donatur.donations', compact('donations'));
     }
 }
