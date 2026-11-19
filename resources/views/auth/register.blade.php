@@ -102,7 +102,7 @@
 
                 <label class="checkbox-split" style="margin:8px 0 12px;font-size:12px;">
                     <input type="checkbox" name="terms" value="1" required>
-                    <span>Saya setuju dengan <a href="#" style="color:var(--green);font-weight:600;text-decoration:underline">Syarat & Ketentuan</a></span>
+                    <span>Saya setuju dengan <a href="{{ route('terms') }}" target="_blank" style="color:var(--green);font-weight:600;text-decoration:underline">Syarat & Ketentuan</a></span>
                 </label>
 
                 <button type="submit" class="btn-submit-split" style="padding:11px 20px;font-size:14px;">Daftar</button>

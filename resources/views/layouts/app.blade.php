@@ -110,8 +110,8 @@
             <div class="footer-bottom">
                 <span>© {{ date('Y') }} Rumah Peduli. Seluruh hak dilindungi.</span>
                 <div class="footer-bottom-links">
-                    <a href="#">Kebijakan Privasi</a>
-                    <a href="#">Syarat &amp; Ketentuan</a>
+                    <a href="{{ route('terms') }}">Kebijakan Privasi</a>
+                    <a href="{{ route('terms') }}">Syarat &amp; Ketentuan</a>
                 </div>
             </div>
         </div>

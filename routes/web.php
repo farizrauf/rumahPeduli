@@ -15,6 +15,7 @@ Route::get('/panti/{panti}', [HomeController::class, 'pantiShow'])->name('panti.
 Route::get('/kampanye', [HomeController::class, 'campaignIndex'])->name('campaigns.index');
 Route::get('/kampanye/{kampanye}', [HomeController::class, 'campaignShow'])->name('campaigns.show');
 Route::get('/transparansi', [ReportController::class, 'index'])->name('reports.index');
+Route::view('/syarat-ketentuan', 'public.terms')->name('terms');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
