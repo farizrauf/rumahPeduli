@@ -22,10 +22,12 @@ class Kampanye extends Model
     ];
 
     protected $casts = [
-        'target_dana' => 'decimal:2',
-        'tanggal_mulai' => 'date',
+        'target_dana'     => 'decimal:2',
+        'tanggal_mulai'   => 'date',
         'tanggal_selesai' => 'date',
     ];
+
+    // ─── Relasi ──────────────────────────────────────────────────
 
     public function panti(): BelongsTo
     {
@@ -39,7 +41,31 @@ class Kampanye extends Model
 
     public function verifiedDonations(): HasMany
     {
-        // Relasi ini dipakai saat menghitung dana yang benar-benar masuk.
         return $this->donasi()->where('status', 'verified');
+    }
+
+    // ─── Accessor ────────────────────────────────────────────────
+
+    /**
+     * Total dana yang sudah diverifikasi.
+     * Dipakai di campaign-show.blade.php: $kampanye->dana_terkumpul
+     */
+    public function getDanaTerkumpulAttribute(): float
+    {
+        // Jika sudah di-load lewat withSum, pakai nilai itu langsung.
+        if (isset($this->attributes['dana_terkumpul'])) {
+            return (float) $this->attributes['dana_terkumpul'];
+        }
+
+        return (float) $this->verifiedDonations()->sum('nominal');
+    }
+
+    /**
+     * Jumlah donatur unik yang sudah terverifikasi.
+     * Dipakai di campaign-show.blade.php: $kampanye->jumlah_donatur
+     */
+    public function getJumlahDonaturAttribute(): int
+    {
+        return $this->verifiedDonations()->distinct('user_id')->count('user_id');
     }
 }

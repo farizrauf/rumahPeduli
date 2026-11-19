@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Donasi extends Model
 {
-    // Nama tabel mengikuti database lama yang dipakai project RumahPeduli.
     protected $table = 'donasi';
 
     protected $fillable = [
@@ -24,9 +23,11 @@ class Donasi extends Model
     ];
 
     protected $casts = [
-        'nominal' => 'decimal:2',
+        'nominal'     => 'decimal:2',
         'verified_at' => 'datetime',
     ];
+
+    // ─── Relasi ──────────────────────────────────────────────────
 
     public function user(): BelongsTo
     {

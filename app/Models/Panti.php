@@ -31,18 +31,30 @@ class Panti extends Model
     protected $casts = [
         'jumlah_anak' => 'integer',
         'verified_at' => 'datetime',
-        'deleted_at' => 'datetime',
+        'deleted_at'  => 'datetime',
     ];
+
+    // ─── Relasi ──────────────────────────────────────────────────
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Nama "kampanye" dipakai konsisten di seluruh project.
+     */
+    public function kampanye(): HasMany
+    {
+        return $this->hasMany(Kampanye::class, 'panti_id');
+    }
+
+    /**
+     * Alias agar kode lama yang memakai "campaigns" tetap bekerja.
+     */
     public function campaigns(): HasMany
     {
-        // Satu panti dapat memiliki banyak kampanye.
-        return $this->hasMany(Kampanye::class, 'panti_id');
+        return $this->kampanye();
     }
 
     public function needs(): HasMany

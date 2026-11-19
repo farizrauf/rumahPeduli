@@ -23,10 +23,12 @@ class Pengeluaran extends Model
     ];
 
     protected $casts = [
-        'nominal' => 'decimal:2',
-        'tanggal' => 'date',
+        'nominal'     => 'decimal:2',
+        'tanggal'     => 'date',
         'verified_at' => 'datetime',
     ];
+
+    // ─── Relasi ──────────────────────────────────────────────────
 
     public function panti(): BelongsTo
     {
