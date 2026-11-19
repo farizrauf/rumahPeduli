@@ -26,7 +26,7 @@
 @endphp
 
 @if ($notifType)
-<div id="modal-notification-overlay" class="modal-notif-overlay" role="dialog" aria-modal="true" aria-label="Notifikasi">
+<div id="modal-notification-overlay" class="modal-notif-overlay" role="dialog" aria-modal="true" aria-label="Notifikasi" onclick="if(event.target===this) closeModalNotif();">
     <div class="modal-notif-card modal-notif-{{$notifType}}">
         <div class="modal-notif-icon">
             @if ($notifType === 'success')
@@ -53,10 +53,21 @@
         </div>
         <h3 class="modal-notif-title">{{$notifTitle}}</h3>
         <p class="modal-notif-message">{{$notifMessage}}</p>
-        <button class="modal-notif-btn modal-notif-btn-{{$notifType}}" onclick="closeModalNotif()">OK</button>
+        <button type="button" class="modal-notif-btn modal-notif-btn-{{$notifType}}" onclick="closeModalNotif();">OK</button>
     </div>
 </div>
 <script>
+window.closeModalNotif = function() {
+    var overlay = document.getElementById('modal-notification-overlay');
+    if (!overlay) return;
+    overlay.classList.add('modal-notif-closing');
+    document.body.style.overflow = '';
+    setTimeout(function(){
+        if (overlay.parentNode) {
+            overlay.parentNode.removeChild(overlay);
+        }
+    }, 300);
+};
 (function(){
     var overlay = document.getElementById('modal-notification-overlay');
     if (!overlay) return;
@@ -65,12 +76,5 @@
     setTimeout(function(){ closeModalNotif(); }, 4000);
     @endif
 })();
-function closeModalNotif() {
-    var overlay = document.getElementById('modal-notification-overlay');
-    if (overlay) {
-        overlay.classList.add('modal-notif-closing');
-        setTimeout(function(){ overlay.style.display = 'none'; document.body.style.overflow = ''; }, 300);
-    }
-}
 </script>
 @endif
