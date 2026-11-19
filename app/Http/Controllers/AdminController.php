@@ -218,6 +218,21 @@ class AdminController extends Controller
         return back()->with('success', 'Status pengajuan panti berhasil diperbarui.');
     }
 
+    public function destroyPanti(Panti $panti)
+    {
+        // Delete panti and related data
+        DB::transaction(function () use ($panti) {
+            // Delete related campaigns
+            $panti->kampanye()->delete();
+            // Delete related expenses
+            $panti->pengeluaran()->delete();
+            // Delete the panti
+            $panti->delete();
+        });
+
+        return back()->with('success', 'Panti berhasil dihapus dari sistem.');
+    }
+
     public function verifyDonation(Request $request, Donasi $donasi)
     {
         $data = $request->validate([

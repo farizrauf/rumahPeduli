@@ -77,6 +77,13 @@
                                 </form>
                             </div>
                         @endif
+                        @if($item->status_verifikasi === 'rejected')
+                            <form method="POST" action="{{ route('admin.panti.destroy', $item) }}" onsubmit="return confirm('Yakin ingin menghapus panti {{ $item->nama }}? Data kampanye dan pengeluaran terkait juga akan dihapus.')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="table-action action-danger" type="submit">Hapus Panti</button>
+                            </form>
+                        @endif
                     </div>
                 </td>
             </tr>
