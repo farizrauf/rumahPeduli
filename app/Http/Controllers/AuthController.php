@@ -28,12 +28,17 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $data = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt($credentials + ['status' => 'aktif'], $request->boolean('remember'))) {
+        $berhasilLogin = Auth::attempt(
+            $data + ['status' => 'aktif'],
+            $request->boolean('remember')
+        );
+
+        if (! $berhasilLogin) {
             return back()->withErrors(['email' => 'Email atau kata sandi tidak sesuai.'])->onlyInput('email');
         }
 
@@ -44,7 +49,7 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $validated = $request->validate([
+        $data = $request->validate([
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:150', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(8)],
@@ -58,34 +63,43 @@ class AuthController extends Controller
             'dokumen' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ]);
 
-        DB::transaction(function () use ($request, $validated, &$user) {
+        $dokumenPanti = null;
+        if ($request->hasFile('dokumen')) {
+            $dokumenPanti = $request->file('dokumen')->store('dokumen-panti', 'public');
+        }
+
+        $user = DB::transaction(function () use ($request, $data, $dokumenPanti) {
             $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'role' => $validated['role'],
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'role' => $data['role'],
                 'status' => 'aktif',
             ]);
 
-            if ($validated['role'] === 'panti') {
+            if ($data['role'] === 'panti') {
                 $user->panti()->create([
-                    'nama' => $validated['nama_panti'],
-                    'alamat' => $validated['alamat'],
-                    'kota' => $validated['kota'],
-                    'jumlah_anak' => $validated['jumlah_anak'] ?? 0,
-                    'deskripsi' => $validated['deskripsi'] ?? null,
-                    'dokumen' => $request->file('dokumen')?->store('dokumen-panti', 'public'),
+                    'nama' => $data['nama_panti'],
+                    'alamat' => $data['alamat'],
+                    'kota' => $data['kota'],
+                    'jumlah_anak' => $data['jumlah_anak'] ?? 0,
+                    'deskripsi' => $data['deskripsi'] ?? null,
+                    'dokumen' => $dokumenPanti,
                     'status_verifikasi' => 'pending',
                 ]);
             }
+
+            return $user;
         });
 
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard')->with('success', $user->role === 'panti'
+        $pesan = $user->role === 'panti'
             ? 'Akun dan pengajuan panti berhasil dibuat. Profil Anda menunggu verifikasi admin.'
-            : 'Akun berhasil dibuat. Selamat datang di Rumah Peduli!');
+            : 'Akun berhasil dibuat. Selamat datang di Rumah Peduli!';
+
+        return redirect()->route('dashboard')->with('success', $pesan);
     }
 
     public function logout(Request $request)
@@ -99,10 +113,13 @@ class AuthController extends Controller
 
     private function dashboardRouteName(User $user): string
     {
-        return match ($user->role) {
-            'admin' => 'admin.dashboard',
-            'panti' => 'panti.dashboard',
-            default => 'donatur.dashboard',
-        };
+        switch ($user->role) {
+            case 'admin':
+                return 'admin.dashboard';
+            case 'panti':
+                return 'panti.dashboard';
+            default:
+                return 'donatur.dashboard';
+        }
     }
 }

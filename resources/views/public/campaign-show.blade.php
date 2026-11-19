@@ -103,7 +103,4 @@
     </div>
 </section>
 
-@media (max-width: 720px) {
-.container[style*="grid-template-columns:1.2fr"] { display: block !important; }
-}
 @endsection

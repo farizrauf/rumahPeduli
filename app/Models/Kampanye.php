@@ -39,6 +39,7 @@ class Kampanye extends Model
 
     public function verifiedDonations(): HasMany
     {
+        // Relasi ini dipakai saat menghitung dana yang benar-benar masuk.
         return $this->donasi()->where('status', 'verified');
     }
 }

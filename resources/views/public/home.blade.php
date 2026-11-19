@@ -10,7 +10,7 @@
                 <span></span>
                 Gerakan kebaikan bersama
             </div>
-            <h1>Bersama Kita Bisa Membantu <span class="accent">Mereka</span></h1>
+            <h1>Bersama kita bisa membantu <span class="accent">mereka</span></h1>
             <p>Hubungkan kepedulian Anda dengan panti dan kampanye tepercaya di seluruh Indonesia. Setiap bantuan diverifikasi, disalurkan, dan dilaporkan secara transparan.</p>
             <div class="hero-actions">
                 <a class="btn btn-primary btn-lg" href="{{ route('campaigns.index') }}">

@@ -107,7 +107,7 @@
                 Rumah Peduli <span>/ @yield('section-name', 'Dashboard')</span>
             </div>
             <div class="dashboard-topbar-actions">
-                <a class="topbar-link" href="{{ route('home') }}">← Lihat situs</a>
+                <a class="topbar-link" href="{{ route('home') }}">Lihat situs</a>
                 <form method="POST" action="{{ route('logout') }}" style="margin:0">
                     @csrf
                     <button class="btn btn-outline btn-sm" type="submit">Keluar</button>
@@ -119,6 +119,8 @@
         </div>
     </section>
 </div>
+
+<x-modal-notification />
 
 @push('scripts')
 <script>

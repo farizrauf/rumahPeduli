@@ -37,6 +37,7 @@ class Panti extends Model
 
     public function campaigns(): HasMany
     {
+        // Satu panti dapat memiliki banyak kampanye.
         return $this->hasMany(Kampanye::class, 'panti_id');
     }
 

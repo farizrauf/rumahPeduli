@@ -12,11 +12,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // Kolom yang boleh diisi melalui User::create().
     protected $fillable = [
         'name',
         'email',
@@ -25,18 +21,10 @@ class User extends Authenticatable
         'status',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+    // Password tidak pernah ikut dikirim ke response atau view.
     protected $hidden = ['password', 'remember_token'];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
+    // Laravel otomatis melakukan hashing saat password diisi.
     protected $casts = ['password' => 'hashed'];
 
     public function panti()

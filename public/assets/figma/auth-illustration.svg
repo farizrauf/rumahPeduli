@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 760" fill="none">
+  <defs>
+    <linearGradient id="sky" x1="310" y1="0" x2="310" y2="760" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#205955"/><stop offset="1" stop-color="#123D37"/>
+    </linearGradient>
+    <clipPath id="scene"><rect width="620" height="760" rx="36"/></clipPath>
+  </defs>
+  <g clip-path="url(#scene)">
+    <path fill="url(#sky)" d="M0 0h620v760H0z"/>
+    <circle cx="492" cy="287" r="132" fill="#4C9A83" fill-opacity=".45"/>
+    <circle cx="492" cy="287" r="91" fill="#70B79B" fill-opacity=".35"/>
+    <ellipse cx="151" cy="222" fill="#B5D7CA" fill-opacity=".2" rx="70" ry="20"/>
+    <ellipse cx="199" cy="203" fill="#B5D7CA" fill-opacity=".19" rx="44" ry="18"/>
+    <ellipse cx="519" cy="421" fill="#B5D7CA" fill-opacity=".2" rx="67" ry="17"/>
+    <path fill="#B3D8CB" d="m202 177 3 9 9 3-9 3-3 9-3-9-9-3 9-3 3-9Zm238-7 2 7 7 2-7 2-2 7-2-7-7-2 7-2 2-7Zm139 97 2 7 7 2-7 2-2 7-2-7-7-2 7-2 2-7ZM91 344l2 7 7 2-7 2-2 7-2-7-7-2 7-2 2-7Zm299-76 2 7 7 2-7 2-2 7-2-7-7-2 7-2 2-7Z"/>
+    <path fill="#F4E7B5" d="M341 224c-8-12-23-3-17 7 3 5 17 15 17 15s14-10 17-15c6-10-9-19-17-7Z"/>
+    <path fill="#83DAB2" d="M88 284c-11-16-32-5-24 9 5 8 24 21 24 21s19-13 24-21c8-14-13-25-24-9Zm389-81c-9-13-27-4-20 8 4 6 20 17 20 17s16-11 20-17c7-12-11-21-20-8Zm-58 208c-9-13-27-4-20 8 4 6 20 17 20 17s16-11 20-17c7-12-11-21-20-8Z"/>
+    <path fill="#F2E8C4" d="M535 369c-11-16-33-5-24 10 5 8 24 22 24 22s19-14 24-22c9-15-13-26-24-10Z"/>
+
+    <!-- Home -->
+    <path fill="#1A4944" d="M395 328h34v174h-34z"/>
+    <path fill="#F5F4E7" d="M194 406h231v151H194z"/>
+    <path fill="#3DB77C" d="m165 407 131-111a17 17 0 0 1 22 0l137 111c5 4 2 12-5 12H170c-7 0-10-8-5-12Z"/>
+    <path fill="#E5FAEF" d="M280 370a25 25 0 1 1 50 0 25 25 0 0 1-50 0Z"/>
+    <path fill="#36B77B" d="M305 363c-5-7-14-2-10 5 2 3 10 10 10 10s8-7 10-10c4-7-5-12-10-5Z"/>
+    <path fill="#FFF0C4" d="M226 437h49v44h-49zM344 437h49v44h-49z"/>
+    <path stroke="#36776D" stroke-width="4" d="M250 437v44m-24-22h49m93-22v44m-24-22h49"/>
+    <path fill="#28625B" d="M280 556v-34a25 25 0 0 1 50 0v34h-50Z"/>
+
+    <!-- Trees -->
+    <path fill="#255D55" d="M74 507h12v63H74zM529 490h12v77h-12z"/>
+    <circle cx="80" cy="491" r="35" fill="#289F6B"/><circle cx="54" cy="510" r="26" fill="#39B77C"/><circle cx="103" cy="514" r="24" fill="#32AA73"/>
+    <circle cx="535" cy="483" r="36" fill="#289F6B"/><circle cx="508" cy="501" r="26" fill="#39B77C"/><circle cx="560" cy="503" r="25" fill="#32AA73"/>
+
+    <!-- Rolling green hills -->
+    <path fill="#3DB77C" d="M0 535c112-39 208-42 310-20 111 24 207 45 310 0v245H0V535Z"/>
+    <path fill="#309E69" d="M0 612c110-31 195-30 303-18 119 14 213-4 317 23v143H0V612Z"/>
+
+    <!-- Five children holding hands -->
+    <g stroke="#F3C895" stroke-width="9" stroke-linecap="round">
+      <path d="M204 626h25m45 0h27m45 0h25m45 0h26"/>
+    </g>
+    <g>
+      <path fill="#182F2B" d="M183 576c0-16 11-27 25-27s25 11 25 27v9h-50v-9Z"/><circle cx="208" cy="580" r="22" fill="#E7B98F"/><path stroke="#28463C" stroke-width="3" stroke-linecap="round" d="M199 582h1m16 0h1m-12 10c3 3 8 3 11 0"/><path fill="#FFD25B" d="M179 611c0-11 9-20 20-20h18c11 0 20 9 20 20v36h-58v-36Z"/><path fill="#226457" d="M190 646h9v26a5 5 0 0 1-9 0v-26Zm22 0h9v26a5 5 0 0 1-9 0v-26Z"/>
+      <path fill="#513527" d="M246 576c0-16 11-27 25-27s25 11 25 27v9h-50v-9Z"/><circle cx="271" cy="580" r="22" fill="#DFA77D"/><path stroke="#28463C" stroke-width="3" stroke-linecap="round" d="M262 582h1m16 0h1m-12 10c3 3 8 3 11 0"/><path fill="#F8877A" d="M242 611c0-11 9-20 20-20h18c11 0 20 9 20 20v36h-58v-36Z"/><path fill="#226457" d="M253 646h9v26a5 5 0 0 1-9 0v-26Zm22 0h9v26a5 5 0 0 1-9 0v-26Z"/>
+      <path fill="#183E38" d="M309 576c0-16 11-27 25-27s25 11 25 27v9h-50v-9Z"/><circle cx="334" cy="580" r="22" fill="#A96F4C"/><path stroke="#28463C" stroke-width="3" stroke-linecap="round" d="M325 582h1m16 0h1m-12 10c3 3 8 3 11 0"/><path fill="#F5F3E8" d="M305 611c0-11 9-20 20-20h18c11 0 20 9 20 20v36h-58v-36Z"/><path fill="#226457" d="M316 646h9v26a5 5 0 0 1-9 0v-26Zm22 0h9v26a5 5 0 0 1-9 0v-26Z"/>
+      <path fill="#65412D" d="M372 576c0-16 11-27 25-27s25 11 25 27v9h-50v-9Z"/><circle cx="397" cy="580" r="22" fill="#E8B88D"/><path stroke="#28463C" stroke-width="3" stroke-linecap="round" d="M388 582h1m16 0h1m-12 10c3 3 8 3 11 0"/><path fill="#70B8F1" d="M368 611c0-11 9-20 20-20h18c11 0 20 9 20 20v36h-58v-36Z"/><path fill="#226457" d="M379 646h9v26a5 5 0 0 1-9 0v-26Zm22 0h9v26a5 5 0 0 1-9 0v-26Z"/>
+      <path fill="#302C25" d="M435 576c0-16 11-27 25-27s25 11 25 27v9h-50v-9Z"/><circle cx="460" cy="580" r="22" fill="#C6875F"/><path stroke="#28463C" stroke-width="3" stroke-linecap="round" d="M451 582h1m16 0h1m-12 10c3 3 8 3 11 0"/><path fill="#8DDFB9" d="M431 611c0-11 9-20 20-20h18c11 0 20 9 20 20v36h-58v-36Z"/><path fill="#226457" d="M442 646h9v26a5 5 0 0 1-9 0v-26Zm22 0h9v26a5 5 0 0 1-9 0v-26Z"/>
+    </g>
+
+    <rect x="28" y="690" width="296" height="45" rx="22.5" fill="#F7FBF9"/>
+    <circle cx="51" cy="712" r="13" fill="#DDF5E8"/>
+    <path stroke="#35B77A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m46 712 3 3 6-7"/>
+    <text x="73" y="716" fill="#285D55" font-family="Arial,sans-serif" font-size="11" font-weight="700">Terverifikasi · Transparan · Berdampak nyata</text>
+  </g>
+</svg>

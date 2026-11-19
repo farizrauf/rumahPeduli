@@ -8,7 +8,7 @@
 <div class="dashboard-heading">
     <div>
         <span class="eyebrow">RUANG DONATUR</span>
-        <h1>Halo, {{ auth()->user()->name }} 👋</h1>
+        <h1>Halo, {{ auth()->user()->name }}</h1>
         <p>Terima kasih telah menjadi bagian dari setiap cerita baik.</p>
     </div>
     <a class="button button-primary" href="{{ route('campaigns.index') }}">

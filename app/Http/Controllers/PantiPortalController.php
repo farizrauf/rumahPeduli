@@ -12,21 +12,30 @@ class PantiPortalController extends Controller
 {
     public function dashboard(Request $request)
     {
+        // Satu user panti hanya boleh melihat data panti miliknya sendiri.
         $panti = $request->user()->panti()->with(['needs', 'campaigns', 'expenses'])->firstOrFail();
 
-        return view('panti.dashboard', compact('panti'));
+        return view('panti.dashboard', [
+            'panti' => $panti,
+        ]);
     }
 
     public function items(Request $request, string $type)
     {
         abort_unless(in_array($type, ['kebutuhan', 'kegiatan', 'kampanye', 'pengeluaran'], true), 404);
         $panti = $request->user()->panti()->firstOrFail();
-        $relation = match ($type) {
-            'kebutuhan' => $panti->needs(),
-            'kegiatan' => $panti->activities(),
-            'kampanye' => $panti->campaigns(),
-            'pengeluaran' => $panti->expenses(),
-        };
+
+        // Setiap jenis data memakai relasi panti yang berbeda, tetapi bentuk
+        // halaman dan cara paginasi tetap sama.
+        if ($type === 'kebutuhan') {
+            $relation = $panti->needs();
+        } elseif ($type === 'kegiatan') {
+            $relation = $panti->activities();
+        } elseif ($type === 'kampanye') {
+            $relation = $panti->campaigns();
+        } else {
+            $relation = $panti->expenses();
+        }
 
         return view('panti.items', [
             'panti' => $panti,
@@ -90,7 +99,9 @@ class PantiPortalController extends Controller
             $this->saveItem($panti->expenses(), $data, $id);
         }
 
-        return back()->with('success', $id ? 'Perubahan berhasil disimpan.' : 'Data berhasil disimpan.');
+        $pesan = $id ? 'Perubahan berhasil disimpan.' : 'Data berhasil disimpan.';
+
+        return back()->with('success', $pesan);
     }
 
     public function updateProfile(Request $request)
@@ -105,6 +116,7 @@ class PantiPortalController extends Controller
             'foto' => ['nullable', 'image', 'max:5120'],
             'dokumen' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ]);
+        // File profil disimpan sesuai jenisnya agar mudah ditemukan kembali.
         foreach (['foto', 'dokumen'] as $file) {
             if ($request->hasFile($file)) {
                 $data[$file] = $request->file($file)->store($file === 'foto' ? 'foto-panti' : 'dokumen-panti', 'public');
@@ -122,13 +134,17 @@ class PantiPortalController extends Controller
     public function destroyItem(Request $request, string $type, int $id)
     {
         $panti = $request->user()->panti()->firstOrFail();
-        $model = match ($type) {
-            'kebutuhan' => Kebutuhan::query(),
-            'kegiatan' => Kegiatan::query(),
-            'kampanye' => Kampanye::query(),
-            'pengeluaran' => Pengeluaran::query(),
-            default => abort(404),
-        };
+        if ($type === 'kebutuhan') {
+            $model = Kebutuhan::query();
+        } elseif ($type === 'kegiatan') {
+            $model = Kegiatan::query();
+        } elseif ($type === 'kampanye') {
+            $model = Kampanye::query();
+        } elseif ($type === 'pengeluaran') {
+            $model = Pengeluaran::query();
+        } else {
+            abort(404);
+        }
 
         $item = $model->where('panti_id', $panti->id)->findOrFail($id);
         abort_if($item instanceof Pengeluaran && $item->status === 'verified', 403, 'Pengeluaran yang telah diverifikasi tidak dapat dihapus.');
@@ -140,6 +156,7 @@ class PantiPortalController extends Controller
 
     private function saveItem($relation, array $data, ?int $id): void
     {
+        // Jika ada id berarti form sedang mengubah data lama.
         if ($id) {
             $item = $relation->findOrFail($id);
             abort_if($item instanceof Pengeluaran && $item->status === 'verified', 403, 'Pengeluaran yang telah diverifikasi tidak dapat diubah.');

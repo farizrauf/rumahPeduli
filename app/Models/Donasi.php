@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Donasi extends Model
 {
+    // Nama tabel mengikuti database lama yang dipakai project RumahPeduli.
     protected $table = 'donasi';
 
     protected $fillable = [

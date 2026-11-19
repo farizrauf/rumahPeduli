@@ -29,6 +29,7 @@ Route::get('/dashboard', [AuthController::class, 'dashboard'])->middleware('auth
 Route::middleware(['auth', 'role:donatur'])->prefix('donatur')->name('donatur.')->group(function () {
     Route::get('/dashboard', [DonaturController::class, 'dashboard'])->name('dashboard');
     Route::get('/donasi', [DonaturController::class, 'donations'])->name('donations');
+    Route::get('/donasi/{donasi}/bukti', [DonationController::class, 'receipt'])->name('donations.receipt');
     Route::get('/kampanye/{kampanye}/donasi', [DonationController::class, 'create'])->name('donate');
     Route::post('/kampanye/{kampanye}/donasi', [DonationController::class, 'store'])->name('donate.store');
 });

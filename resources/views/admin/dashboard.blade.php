@@ -13,32 +13,32 @@
     </div>
     <div class="heading-actions">
         <span class="live-pill"><span></span> Sistem aktif</span>
-        <a class="button button-outline" href="{{ route('admin.reports') }}">Lihat laporan <span aria-hidden="true">↗</span></a>
+        <a class="button button-outline" href="{{ route('admin.reports') }}">Lihat laporan</a>
     </div>
 </div>
 
 {{-- METRICS GRID --}}
 <div class="metric-grid metric-four">
     <article class="metric-card">
-        <div class="metric-card-top"><span>Total panti terdaftar</span><span class="metric-icon metric-icon-mint" aria-hidden="true">⌂</span></div>
+        <div class="metric-card-top"><span>Total panti terdaftar</span><span class="metric-icon metric-icon-mint" aria-hidden="true"></span></div>
         <strong>{{ number_format($stats['panti']) }}</strong>
         <small>{{ $stats['panti_pending'] }} pengajuan menunggu verifikasi</small>
     </article>
     
     <article class="metric-card metric-green">
-        <div class="metric-card-top"><span>Donatur terdaftar</span><span class="metric-icon metric-icon-green" aria-hidden="true">♥</span></div>
+        <div class="metric-card-top"><span>Donatur terdaftar</span><span class="metric-icon metric-icon-green" aria-hidden="true"></span></div>
         <strong>{{ number_format($stats['donatur']) }}</strong>
         <small>Komunitas berbagi kebaikan</small>
     </article>
     
     <article class="metric-card">
-        <div class="metric-card-top"><span>Donasi terverifikasi</span><span class="metric-icon metric-icon-blue" aria-hidden="true">↗</span></div>
+        <div class="metric-card-top"><span>Donasi terverifikasi</span><span class="metric-icon metric-icon-blue" aria-hidden="true"></span></div>
         <strong>Rp {{ number_format($stats['donasi']/1000000,1,',','.') }} jt</strong>
         <small>{{ $stats['donasi_pending'] }} transaksi menunggu tinjauan</small>
     </article>
     
     <article class="metric-card metric-green">
-        <div class="metric-card-top"><span>Kampanye aktif</span><span class="metric-icon metric-icon-orange" aria-hidden="true">✦</span></div>
+        <div class="metric-card-top"><span>Kampanye aktif</span><span class="metric-icon metric-icon-orange" aria-hidden="true"></span></div>
         <strong>{{ $stats['kampanye'] }}</strong>
         <small>Penggalangan dana berjalan</small>
     </article>
@@ -54,7 +54,7 @@
                 <h2>Pengajuan panti terbaru</h2>
             </div>
             <a class="text-link" href="{{ route('admin.panti',['status'=>'pending']) }}">
-                Lihat semua <span aria-hidden="true">→</span>
+                Lihat semua
             </a>
         </div>
         
@@ -103,7 +103,7 @@
                 <h2>Transaksi menunggu</h2>
             </div>
             <a class="text-link" href="{{ route('admin.donations',['status'=>'pending']) }}">
-                Lihat semua <span aria-hidden="true">→</span>
+                Lihat semua
             </a>
         </div>
         

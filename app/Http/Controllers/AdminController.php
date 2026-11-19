@@ -17,6 +17,7 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
+        // Angka ringkasan diambil dari status terakhir yang sudah diverifikasi.
         return view('admin.dashboard', [
             'stats' => [
                 'panti' => Panti::count(),
@@ -33,48 +34,92 @@ class AdminController extends Controller
 
     public function panti()
     {
+        $panti = Panti::with('user')
+            ->when(request('status'), function ($query, $status) {
+                $query->where('status_verifikasi', $status);
+            })
+            ->when(request('q'), function ($query, $search) {
+                $query->where('nama', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
         return view('admin.panti', [
-            'panti' => Panti::with('user')->when(request('status'), fn ($query, $status) => $query->where('status_verifikasi', $status))
-                ->when(request('q'), fn ($query, $search) => $query->where('nama', 'like', "%{$search}%"))
-                ->latest()->paginate(12)->withQueryString(),
+            'panti' => $panti,
         ]);
     }
 
     public function campaigns()
     {
+        $campaigns = Kampanye::with('panti')
+            ->withSum(['donasi as dana_terkumpul' => function ($query) {
+                $query->where('status', 'verified');
+            }], 'nominal')
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
         return view('admin.campaigns', [
-            'campaigns' => Kampanye::with('panti')->withSum(['donasi as dana_terkumpul' => fn ($query) => $query->where('status', 'verified')], 'nominal')
-                ->latest()->paginate(12)->withQueryString(),
+            'campaigns' => $campaigns,
         ]);
     }
 
     public function donations()
     {
+        $donations = Donasi::with(['user', 'kampanye'])
+            ->when(request('status'), function ($query, $status) {
+                $query->where('status', $status);
+            })
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
         return view('admin.donations', [
-            'donations' => Donasi::with(['user', 'kampanye'])->when(request('status'), fn ($query, $status) => $query->where('status', $status))
-                ->latest()->paginate(12)->withQueryString(),
+            'donations' => $donations,
         ]);
     }
 
     public function expenses()
     {
+        $expenses = Pengeluaran::with(['panti', 'kampanye'])
+            ->when(request('status'), function ($query, $status) {
+                $query->where('status', $status);
+            })
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
         return view('admin.expenses', [
-            'expenses' => Pengeluaran::with(['panti', 'kampanye'])->when(request('status'), fn ($query, $status) => $query->where('status', $status))
-                ->latest()->paginate(12)->withQueryString(),
+            'expenses' => $expenses,
         ]);
     }
 
     public function users()
     {
+        $users = User::with('panti')
+            ->when(request('role'), function ($query, $role) {
+                $query->where('role', $role);
+            })
+            ->when(request('q'), function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
         return view('admin.users', [
-            'users' => User::with('panti')->when(request('role'), fn ($query, $role) => $query->where('role', $role))
-                ->when(request('q'), fn ($query, $search) => $query->where(fn ($query) => $query->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")))
-                ->latest()->paginate(12)->withQueryString(),
+            'users' => $users,
         ]);
     }
 
     public function storeUser(Request $request)
     {
+        // Admin dapat membuat donatur atau panti. Jika role panti dipilih,
+        // profil panti dibuat dalam transaksi yang sama.
         $data = $request->validate([
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:150', 'unique:users,email'],
@@ -114,6 +159,8 @@ class AdminController extends Controller
 
     public function reports()
     {
+        // Laporan admin memakai sumber data yang sama dengan laporan publik,
+        // tetapi ditambah rincian per panti dan grafik enam bulan terakhir.
         $panti = Panti::where('status_verifikasi', 'verified')
             ->select('panti.*')
             ->selectSub(fn ($query) => $query->from('kampanye')
@@ -154,6 +201,7 @@ class AdminController extends Controller
 
     public function verifyPanti(Request $request, Panti $panti)
     {
+        // Verifikasi selalu menyimpan siapa adminnya dan kapan dilakukan.
         $data = $request->validate([
             'status_verifikasi' => ['required', 'in:verified,rejected'],
             'catatan_admin' => ['nullable', 'string', 'max:255'],
