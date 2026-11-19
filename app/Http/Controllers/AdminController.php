@@ -34,12 +34,22 @@ class AdminController extends Controller
 
     public function panti()
     {
-        $panti = Panti::with('user')
-            ->when(request('status'), function ($query, $status) {
-                $query->where('status_verifikasi', $status);
+        $query = Panti::with('user');
+
+        // Handle trashed filter
+        if (request('trashed') === 'only') {
+            $query->onlyTrashed();
+        } elseif (request('trashed') === 'with') {
+            $query->withTrashed();
+        }
+
+        // Other filters
+        $panti = $query
+            ->when(request('status'), function ($q, $status) {
+                $q->where('status_verifikasi', $status);
             })
-            ->when(request('q'), function ($query, $search) {
-                $query->where('nama', 'like', "%{$search}%");
+            ->when(request('q'), function ($q, $search) {
+                $q->where('nama', 'like', "%{$search}%");
             })
             ->latest()
             ->paginate(12)
@@ -220,17 +230,19 @@ class AdminController extends Controller
 
     public function destroyPanti(Panti $panti)
     {
-        // Delete panti and related data
-        DB::transaction(function () use ($panti) {
-            // Delete related campaigns
-            $panti->kampanye()->delete();
-            // Delete related expenses
-            $panti->pengeluaran()->delete();
-            // Delete the panti
-            $panti->delete();
-        });
+        // Soft delete - data tetap ada di database dengan deleted_at
+        $panti->delete();
 
-        return back()->with('success', 'Panti berhasil dihapus dari sistem.');
+        return back()->with('success', 'Panti berhasil diarsipkan. Data masih tersimpan dan dapat dipulihkan.');
+    }
+
+    public function restorePanti($id)
+    {
+        // Restore soft deleted panti
+        $panti = Panti::withTrashed()->findOrFail($id);
+        $panti->restore();
+
+        return back()->with('success', 'Panti berhasil dipulihkan dari arsip.');
     }
 
     public function verifyDonation(Request $request, Donasi $donasi)

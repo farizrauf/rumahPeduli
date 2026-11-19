@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Panti extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'panti';
 
     protected $fillable = [
@@ -28,6 +31,7 @@ class Panti extends Model
     protected $casts = [
         'jumlah_anak' => 'integer',
         'verified_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

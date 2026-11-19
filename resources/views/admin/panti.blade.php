@@ -25,6 +25,11 @@
             </option>
         @endforeach
     </select>
+    <select name="trashed">
+        <option value="">Aktif</option>
+        <option value="only" @selected(request('trashed')==='only')>Diarsipkan</option>
+        <option value="with" @selected(request('trashed')==='with')>Semua (termasuk arsip)</option>
+    </select>
     <button class="button button-outline button-small">Filter</button>
 </form>
 
@@ -59,30 +64,40 @@
                 </td>
                 <td>
                     <div style="display:flex;flex-direction:column;gap:8px;">
-                        <span class="status-badge status-{{ $item->status_verifikasi }}">
-                            {{ ucfirst($item->status_verifikasi) }}
-                        </span>
-                        @if($item->status_verifikasi === 'pending')
-                            <div class="table-actions-row">
-                                <form class="verify-form" method="POST" action="{{ route('admin.panti.verify',$item) }}">
-                                    @csrf
-                                    <input type="hidden" name="status_verifikasi" value="verified">
-                                    <button class="table-action action-success">Setujui</button>
-                                </form>
-                                <form class="verify-form" method="POST" action="{{ route('admin.panti.verify',$item) }}">
-                                    @csrf
-                                    <input type="hidden" name="status_verifikasi" value="rejected">
-                                    <input name="catatan_admin" placeholder="Catatan bila ditolak" style="width:160px;">
-                                    <button class="table-action action-danger">Tolak</button>
-                                </form>
-                            </div>
-                        @endif
-                        @if($item->status_verifikasi === 'rejected')
-                            <form method="POST" action="{{ route('admin.panti.destroy', $item) }}" onsubmit="return confirm('Yakin ingin menghapus panti {{ $item->nama }}? Data kampanye dan pengeluaran terkait juga akan dihapus.')">
+                        @if($item->trashed())
+                            <span class="status-badge" style="background:#fee2e2;color:#991b1b;border-color:#fecaca;">
+                                Diarsipkan
+                            </span>
+                            <form method="POST" action="{{ route('admin.panti.restore', $item->id) }}">
                                 @csrf
-                                @method('DELETE')
-                                <button class="table-action action-danger" type="submit">Hapus Panti</button>
+                                <button class="table-action action-success" type="submit">Pulihkan</button>
                             </form>
+                        @else
+                            <span class="status-badge status-{{ $item->status_verifikasi }}">
+                                {{ ucfirst($item->status_verifikasi) }}
+                            </span>
+                            @if($item->status_verifikasi === 'pending')
+                                <div class="table-actions-row">
+                                    <form class="verify-form" method="POST" action="{{ route('admin.panti.verify',$item) }}">
+                                        @csrf
+                                        <input type="hidden" name="status_verifikasi" value="verified">
+                                        <button class="table-action action-success">Setujui</button>
+                                    </form>
+                                    <form class="verify-form" method="POST" action="{{ route('admin.panti.verify',$item) }}">
+                                        @csrf
+                                        <input type="hidden" name="status_verifikasi" value="rejected">
+                                        <input name="catatan_admin" placeholder="Catatan bila ditolak" style="width:160px;">
+                                        <button class="table-action action-danger">Tolak</button>
+                                    </form>
+                                </div>
+                            @endif
+                            @if($item->status_verifikasi === 'rejected')
+                                <form method="POST" action="{{ route('admin.panti.destroy', $item) }}" onsubmit="return confirm('Arsipkan panti {{ $item->nama }}? Data masih dapat dipulihkan.')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="table-action action-danger" type="submit">Arsipkan</button>
+                                </form>
+                            @endif
                         @endif
                     </div>
                 </td>

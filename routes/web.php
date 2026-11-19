@@ -48,6 +48,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/panti', [AdminController::class, 'panti'])->name('panti');
     Route::post('/panti/{panti}/verifikasi', [AdminController::class, 'verifyPanti'])->name('panti.verify');
     Route::delete('/panti/{panti}', [AdminController::class, 'destroyPanti'])->name('panti.destroy');
+    Route::post('/panti/{id}/restore', [AdminController::class, 'restorePanti'])->name('panti.restore');
     Route::get('/kampanye', [AdminController::class, 'campaigns'])->name('campaigns');
     Route::get('/donasi', [AdminController::class, 'donations'])->name('donations');
     Route::post('/donasi/{donasi}/verifikasi', [AdminController::class, 'verifyDonation'])->name('donations.verify');
