@@ -12,7 +12,9 @@ class EnsureRole
     {
         $user = $request->user();
 
-        abort_unless($user && $user->status === 'aktif' && in_array($user->role, $roles, true), 403);
+        if (! $user || ! in_array($user->role, $roles, true) || $user->status !== 'aktif') {
+            abort(403);
+        }
 
         return $next($request);
     }

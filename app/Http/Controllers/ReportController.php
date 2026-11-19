@@ -10,28 +10,10 @@ class ReportController extends Controller
 {
     public function index()
     {
-        // Laporan publik hanya menghitung donasi dan pengeluaran yang sudah diverifikasi.
-        $panti = Panti::where('status_verifikasi', 'verified')
-            ->select('panti.*')
-            ->selectSub(function ($query) {
-                return $query->from('kampanye')
-                ->join('donasi', 'kampanye.id', '=', 'donasi.kampanye_id')
-                ->whereColumn('kampanye.panti_id', 'panti.id')
-                ->where('donasi.status', 'verified')
-                ->selectRaw('coalesce(sum(donasi.nominal), 0)');
-            }, 'total_donasi')
-            ->selectSub(function ($query) {
-                return $query->from('pengeluaran')
-                ->whereColumn('pengeluaran.panti_id', 'panti.id')
-                ->where('pengeluaran.status', 'verified')
-                ->selectRaw('coalesce(sum(pengeluaran.nominal), 0)');
-            }, 'total_pengeluaran')
-            ->paginate(12);
+        $panti            = Panti::where('status_verifikasi', 'verified')->paginate(12);
+        $totalDonasi      = Donasi::where('status', 'verified')->sum('nominal');
+        $totalPengeluaran = Pengeluaran::where('status', 'verified')->sum('nominal');
 
-        return view('public.reports', [
-            'panti' => $panti,
-            'totalDonasi' => Donasi::where('status', 'verified')->sum('nominal'),
-            'totalPengeluaran' => Pengeluaran::where('status', 'verified')->sum('nominal'),
-        ]);
+        return view('public.reports', compact('panti', 'totalDonasi', 'totalPengeluaran'));
     }
 }

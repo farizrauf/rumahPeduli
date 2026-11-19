@@ -17,7 +17,9 @@ class Kegiatan extends Model
         'foto',
     ];
 
-    protected $casts = ['tanggal' => 'date'];
+    protected $casts = [
+        'tanggal' => 'date',
+    ];
 
     public function panti(): BelongsTo
     {
