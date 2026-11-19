@@ -2957,7 +2957,8 @@ body:has(.login-page) { height: 100vh; overflow: hidden; }
   border: 1.5px solid var(--line);
   border-radius: 6px;
   font-size: 13px;
-  min-width: 180px;
+  width: 160px;
+  max-width: 160px;
   outline: none;
   transition: border-color .2s;
 }

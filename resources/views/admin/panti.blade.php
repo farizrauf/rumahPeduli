@@ -58,24 +58,24 @@
                     @endif
                 </td>
                 <td>
-                    <span class="status-badge status-{{ $item->status_verifikasi }}">
-                        {{ ucfirst($item->status_verifikasi) }}
-                    </span>
-                    <div class="table-actions-row">
-                        @if($item->status_verifikasi !== 'verified')
-                            <form class="verify-form" method="POST" action="{{ route('admin.panti.verify',$item) }}">
-                                @csrf
-                                <input type="hidden" name="status_verifikasi" value="verified">
-                                <button class="table-action action-success">Setujui</button>
-                            </form>
-                        @endif
-                        @if($item->status_verifikasi !== 'rejected')
-                            <form class="verify-form" method="POST" action="{{ route('admin.panti.verify',$item) }}">
-                                @csrf
-                                <input type="hidden" name="status_verifikasi" value="rejected">
-                                <input name="catatan_admin" placeholder="Catatan bila ditolak">
-                                <button class="table-action action-danger">Tolak</button>
-                            </form>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <span class="status-badge status-{{ $item->status_verifikasi }}">
+                            {{ ucfirst($item->status_verifikasi) }}
+                        </span>
+                        @if($item->status_verifikasi === 'pending')
+                            <div class="table-actions-row">
+                                <form class="verify-form" method="POST" action="{{ route('admin.panti.verify',$item) }}">
+                                    @csrf
+                                    <input type="hidden" name="status_verifikasi" value="verified">
+                                    <button class="table-action action-success">Setujui</button>
+                                </form>
+                                <form class="verify-form" method="POST" action="{{ route('admin.panti.verify',$item) }}">
+                                    @csrf
+                                    <input type="hidden" name="status_verifikasi" value="rejected">
+                                    <input name="catatan_admin" placeholder="Catatan bila ditolak" style="width:160px;">
+                                    <button class="table-action action-danger">Tolak</button>
+                                </form>
+                            </div>
                         @endif
                     </div>
                 </td>

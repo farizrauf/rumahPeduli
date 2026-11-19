@@ -58,26 +58,28 @@
                     @endif
                 </td>
                 <td>
-                    <span class="status-badge status-{{ $item->status }}">
-                        {{ ucfirst($item->status) }}
-                    </span>
-                    @if($item->status==='pending')
-                        <div class="table-actions-row">
-                            <form class="verify-form" method="POST" action="{{ route('admin.expenses.verify',$item) }}">
-                                @csrf
-                                <input type="hidden" name="status" value="verified">
-                                <button class="table-action action-success">Verifikasi</button>
-                            </form>
-                            <form class="verify-form" method="POST" action="{{ route('admin.expenses.verify',$item) }}">
-                                @csrf
-                                <input type="hidden" name="status" value="rejected">
-                                <input name="catatan_admin" placeholder="Alasan penolakan">
-                                <button class="table-action action-danger">Tolak</button>
-                            </form>
-                        </div>
-                    @elseif($item->catatan_admin)
-                        <small>{{ $item->catatan_admin }}</small>
-                    @endif
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <span class="status-badge status-{{ $item->status }}">
+                            {{ ucfirst($item->status) }}
+                        </span>
+                        @if($item->status==='pending')
+                            <div class="table-actions-row">
+                                <form class="verify-form" method="POST" action="{{ route('admin.expenses.verify',$item) }}">
+                                    @csrf
+                                    <input type="hidden" name="status" value="verified">
+                                    <button class="table-action action-success">Verifikasi</button>
+                                </form>
+                                <form class="verify-form" method="POST" action="{{ route('admin.expenses.verify',$item) }}">
+                                    @csrf
+                                    <input type="hidden" name="status" value="rejected">
+                                    <input name="catatan_admin" placeholder="Alasan penolakan" style="width:160px;">
+                                    <button class="table-action action-danger">Tolak</button>
+                                </form>
+                            </div>
+                        @elseif($item->catatan_admin)
+                            <small style="color:#6b7280;">{{ $item->catatan_admin }}</small>
+                        @endif
+                    </div>
                 </td>
             </tr>
             @empty
