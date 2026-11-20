@@ -242,11 +242,38 @@ class AdminController extends Controller
 
     public function reports()
     {
-        $panti            = Panti::where('status_verifikasi', 'verified')->paginate(12);
         $totalDonasi      = Donasi::where('status', 'verified')->sum('nominal');
         $totalPengeluaran = Pengeluaran::where('status', 'verified')->sum('nominal');
 
-        return view('admin.reports', compact('panti', 'totalDonasi', 'totalPengeluaran'));
+        // Panti verified dengan total donasi & pengeluaran via join
+        $panti = Panti::where('status_verifikasi', 'verified')
+            ->leftJoin('kampanye', 'kampanye.panti_id', '=', 'panti.id')
+            ->leftJoin('donasi', function ($join) {
+                $join->on('donasi.kampanye_id', '=', 'kampanye.id')
+                     ->where('donasi.status', 'verified');
+            })
+            ->leftJoin('pengeluaran', function ($join) {
+                $join->on('pengeluaran.panti_id', '=', 'panti.id')
+                     ->where('pengeluaran.status', 'verified');
+            })
+            ->select('panti.*')
+            ->selectRaw('COALESCE(SUM(DISTINCT donasi.nominal), 0) as total_donasi')
+            ->selectRaw('COALESCE(SUM(DISTINCT pengeluaran.nominal), 0) as total_pengeluaran')
+            ->groupBy('panti.id')
+            ->paginate(12);
+
+        // Data donasi 6 bulan terakhir
+        $monthly = collect(range(5, 0))->map(function ($monthsAgo) {
+            $period = now()->startOfMonth()->subMonths($monthsAgo);
+            return [
+                'periode' => $period->format('Y-m'),
+                'total'   => Donasi::where('status', 'verified')
+                    ->whereBetween('created_at', [$period, $period->copy()->endOfMonth()])
+                    ->sum('nominal'),
+            ];
+        });
+
+        return view('admin.reports', compact('panti', 'totalDonasi', 'totalPengeluaran', 'monthly'));
     }
 
     public function audit()
