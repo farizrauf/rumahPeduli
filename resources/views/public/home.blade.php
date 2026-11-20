@@ -85,7 +85,7 @@
             @forelse ($pantiList as $index => $panti)
             <article class="panti-card">
                 <a class="panti-card-image" href="{{ route('panti.show', $panti) }}">
-                    <img src="{{ asset('assets/figma/panti-'.(($index % 3) + 1).'.jpeg') }}" alt="{{ $panti->nama }}" loading="lazy">
+                    <img src="{{ $panti->foto ? \Illuminate\Support\Facades\Storage::disk('public')->url($panti->foto) : asset('assets/figma/panti-'.(($index % 3) + 1).'.jpeg') }}" alt="{{ $panti->nama }}" loading="lazy">
                     <span class="panti-verified-badge">
                         <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                         Terverifikasi
@@ -234,7 +234,7 @@
             @forelse ($activities as $index => $activity)
             <article class="activity-card">
                 <div class="activity-card-img">
-                    <img src="{{ asset('assets/figma/panti-'.(($index % 3) + 1).'.jpeg') }}" alt="{{ $activity->judul }}" loading="lazy">
+                    <img src="{{ $activity->foto ? \Illuminate\Support\Facades\Storage::disk('public')->url($activity->foto) : asset('assets/figma/panti-'.(($index % 3) + 1).'.jpeg') }}" alt="{{ $activity->judul }}" loading="lazy">
                 </div>
                 <div class="activity-card-body">
                     <span class="activity-date">{{ optional($activity->tanggal)->format('d M Y') }}</span>

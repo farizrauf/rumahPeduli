@@ -36,7 +36,7 @@
             @forelse ($panti as $index => $item)
             <article class="panti-card">
                 <a class="panti-card-image" href="{{ route('panti.show', $item) }}">
-                    <img src="{{ asset('assets/figma/panti-'.(($index % 3) + 1).'.jpeg') }}" alt="{{ $item->nama }}" loading="lazy">
+                    <img src="{{ $item->foto ? \Illuminate\Support\Facades\Storage::disk('public')->url($item->foto) : asset('assets/figma/panti-'.(($index % 3) + 1).'.jpeg') }}" alt="{{ $item->nama }}" loading="lazy">
                     <span class="panti-verified-badge">
                         <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                         Terverifikasi

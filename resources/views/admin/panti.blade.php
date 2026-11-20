@@ -16,8 +16,8 @@
 </div>
 
 <form class="filter-row" method="GET">
-    <input name="q" value="{{ request('q') }}" placeholder="Cari nama panti...">
-    <select name="status">
+    <input type="search" name="q" value="{{ request('q') }}" aria-label="Cari nama panti" placeholder="Cari nama panti...">
+    <select name="status" aria-label="Filter panti berdasarkan status verifikasi">
         <option value="">Semua status</option>
         @foreach(['pending','verified','rejected'] as $status)
             <option value="{{ $status }}" @selected(request('status')===$status)>
@@ -25,12 +25,12 @@
             </option>
         @endforeach
     </select>
-    <select name="trashed">
+    <select name="trashed" aria-label="Filter status arsip">
         <option value="">Aktif</option>
         <option value="only" @selected(request('trashed')==='only')>Diarsipkan</option>
         <option value="with" @selected(request('trashed')==='with')>Semua (termasuk arsip)</option>
     </select>
-    <button class="button button-outline button-small">Filter</button>
+    <button class="button button-outline button-small" type="submit">Filter</button>
 </form>
 
 <div class="table-card">
@@ -62,8 +62,8 @@
                         <span class="muted">Belum ada</span>
                     @endif
                 </td>
-                <td>
-                    <div style="display:flex;flex-direction:column;gap:8px;">
+                <td class="review-action-cell">
+                    <div class="verification-status-stack">
                         @if($item->trashed())
                             <span class="status-badge" style="background:#fee2e2;color:#991b1b;border-color:#fecaca;">
                                 Diarsipkan
@@ -81,14 +81,18 @@
                                     <form class="verify-form" method="POST" action="{{ route('admin.panti.verify',$item) }}">
                                         @csrf
                                         <input type="hidden" name="status_verifikasi" value="verified">
-                                        <button class="table-action action-success">Setujui</button>
+                                        <button class="table-action action-success" type="submit">Setujui</button>
                                     </form>
-                                    <form class="verify-form" method="POST" action="{{ route('admin.panti.verify',$item) }}">
-                                        @csrf
-                                        <input type="hidden" name="status_verifikasi" value="rejected">
-                                        <input name="catatan_admin" placeholder="Catatan bila ditolak" style="width:160px;">
-                                        <button class="table-action action-danger">Tolak</button>
-                                    </form>
+                                    <details class="review-reject-details">
+                                        <summary class="table-action action-danger">Tolak</summary>
+                                        <form class="review-reject-form" method="POST" action="{{ route('admin.panti.verify',$item) }}">
+                                            @csrf
+                                            <input type="hidden" name="status_verifikasi" value="rejected">
+                                            <label for="panti-reason-{{ $item->id }}">Alasan penolakan <span>(opsional)</span></label>
+                                            <input id="panti-reason-{{ $item->id }}" name="catatan_admin" maxlength="255" placeholder="Tulis alasan">
+                                            <button class="table-action action-danger" type="submit">Konfirmasi penolakan</button>
+                                        </form>
+                                    </details>
                                 </div>
                             @endif
                             @if($item->status_verifikasi === 'rejected')

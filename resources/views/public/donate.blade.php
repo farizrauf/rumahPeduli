@@ -3,6 +3,7 @@
 @section('title', 'Donasi · '.$kampanye->judul)
 
 @section('content')
+@php($selectedAmount = (int) old('nominal', 50000))
 <section class="donation-page">
     <div class="container donate-layout">
         <div class="donate-summary">
@@ -27,25 +28,31 @@
             <p class="form-intro">Pilih nominal atau masukkan jumlah yang paling nyaman untuk Anda.</p>
 
             <label for="nominal">Nominal donasi <span>(Rp)</span></label>
-            <input id="nominal" type="number" name="nominal" value="{{ old('nominal', 50000) }}" min="1000" required>
+            <input id="nominal" type="number" name="nominal" value="{{ old('nominal', 50000) }}" min="1000" step="1" inputmode="numeric" aria-describedby="@error('nominal') nominal-error @enderror" required>
+            @error('nominal')
+                <small class="field-error" id="nominal-error">{{ $message }}</small>
+            @enderror
 
             <div class="amount-chips" aria-label="Pilihan nominal donasi">
-                <button class="amount-chip" type="button" data-amount="25000">Rp25rb</button>
-                <button class="amount-chip" type="button" data-amount="50000">Rp50rb</button>
-                <button class="amount-chip" type="button" data-amount="100000">Rp100rb</button>
-                <button class="amount-chip" type="button" data-amount="250000">Rp250rb</button>
+                <button class="amount-chip {{ $selectedAmount === 25000 ? 'selected' : '' }}" type="button" data-amount="25000" aria-pressed="{{ $selectedAmount === 25000 ? 'true' : 'false' }}">Rp25rb</button>
+                <button class="amount-chip {{ $selectedAmount === 50000 ? 'selected' : '' }}" type="button" data-amount="50000" aria-pressed="{{ $selectedAmount === 50000 ? 'true' : 'false' }}">Rp50rb</button>
+                <button class="amount-chip {{ $selectedAmount === 100000 ? 'selected' : '' }}" type="button" data-amount="100000" aria-pressed="{{ $selectedAmount === 100000 ? 'true' : 'false' }}">Rp100rb</button>
+                <button class="amount-chip {{ $selectedAmount === 250000 ? 'selected' : '' }}" type="button" data-amount="250000" aria-pressed="{{ $selectedAmount === 250000 ? 'true' : 'false' }}">Rp250rb</button>
             </div>
 
             <label for="metode">Metode pembayaran</label>
-            <select id="metode" name="metode" required>
+            <select id="metode" name="metode" aria-controls="qris-card" aria-describedby="@error('metode') metode-error @enderror" required>
                 <option value="">Pilih metode pembayaran</option>
                 <option value="Transfer BCA" @selected(old('metode') === 'Transfer BCA')>Transfer BCA</option>
                 <option value="Transfer Mandiri" @selected(old('metode') === 'Transfer Mandiri')>Transfer Mandiri</option>
                 <option value="QRIS" @selected(old('metode') === 'QRIS')>QRIS</option>
                 <option value="GoPay" @selected(old('metode') === 'GoPay')>GoPay</option>
             </select>
+            @error('metode')
+                <small class="field-error" id="metode-error">{{ $message }}</small>
+            @enderror
 
-            <div id="qris-card" class="qris-card" style="display:none;">
+            <div id="qris-card" class="qris-card" hidden>
                 <p class="qris-card-title">QRIS</p>
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=00020101021226570011ID.DANA.WWW011893600914031000000002150000000000000000303UMI51440014ID.CO.QRIS.WWW0215ID10254639108080303UMI5204000053033605802ID5920RUMAH+PEDULI+CHARITY6013Jakarta+Pusat61051234562070703A016304ABCD" alt="QRIS Code" width="200" height="200">
                 <p class="qris-card-subtitle">Scan dengan aplikasi e-wallet apapun</p>
@@ -70,6 +77,17 @@
             document.querySelector('#nominal').value = button.dataset.amount;
             document.querySelectorAll('.amount-chip').forEach((chip) => chip.classList.remove('selected'));
             button.classList.add('selected');
+            document.querySelectorAll('.amount-chip').forEach((chip) => {
+                chip.setAttribute('aria-pressed', String(chip === button));
+            });
+        });
+    });
+
+    document.querySelector('#nominal').addEventListener('input', (event) => {
+        document.querySelectorAll('.amount-chip').forEach((chip) => {
+            const isSelected = Number(chip.dataset.amount) === Number(event.currentTarget.value);
+            chip.classList.toggle('selected', isSelected);
+            chip.setAttribute('aria-pressed', String(isSelected));
         });
     });
 
@@ -81,7 +99,7 @@
 
         function updateQris() {
             if (metode.value.toLowerCase() === 'qris') {
-                qrisCard.style.display = 'block';
+                qrisCard.hidden = false;
                 if (qrisAmount && nominalInput) {
                     var val = parseInt(nominalInput.value, 10);
                     if (!isNaN(val) && val > 0) {
@@ -91,7 +109,7 @@
                     }
                 }
             } else {
-                qrisCard.style.display = 'none';
+                qrisCard.hidden = true;
             }
         }
 

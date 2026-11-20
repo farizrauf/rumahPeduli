@@ -5,6 +5,7 @@
 @section('section-name', 'Pengguna')
 
 @section('dashboard-content')
+@php($userFormOld = old('_form_context') === 'create-user')
 
 <div class="dashboard-heading">
     <div>
@@ -12,83 +13,101 @@
         <h1>Pengguna</h1>
         <p>Kelola akses donatur dan pengelola panti.</p>
     </div>
-    <button class="button button-primary" onclick="document.getElementById('createUserModal').style.display='flex'">
+    <button class="button button-primary" type="button" data-user-dialog-open>
         + Tambah pengguna
     </button>
 </div>
 
-{{-- Modal Tambah Pengguna --}}
-<div id="createUserModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;align-items:center;justify-content:center;">
-    <div style="background:#fff;border-radius:20px;padding:32px;max-width:800px;width:90%;max-height:90vh;overflow-y:auto;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-            <h2 style="margin:0;font-size:20px;font-weight:700;color:#1a3c2e;">Tambah Pengguna Baru</h2>
-            <button onclick="document.getElementById('createUserModal').style.display='none'" style="background:none;border:none;font-size:24px;cursor:pointer;color:#6b7280;">&times;</button>
-        </div>
-        <form class="profile-form" method="POST" action="{{ route('admin.users.store') }}" style="padding:0;border:none;">
+<dialog id="createUserDialog" class="user-create-dialog" aria-labelledby="create-user-title" @if($userFormOld) data-reopen @endif>
+    <form class="user-create-form" method="POST" action="{{ route('admin.users.store') }}">
             @csrf
-            <div class="form-grid">
+            <input type="hidden" name="_form_context" value="create-user">
+            <div class="user-create-header">
+                <div>
+                    <span class="eyebrow">AKSES PLATFORM</span>
+                    <h2 id="create-user-title">Tambah pengguna</h2>
+                    <p>Buat akun baru untuk donatur, pengelola panti, atau admin.</p>
+                </div>
+                <button class="item-edit-close" type="button" data-user-dialog-close aria-label="Tutup form tambah pengguna">×</button>
+            </div>
+            @if($userFormOld && $errors->any())
+                <div class="form-validation-summary" role="alert">
+                    <strong>Periksa kembali data berikut:</strong>
+                    <ul>
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="user-create-grid">
                 <label>
                     Nama lengkap
-                    <input name="name" required maxlength="100" placeholder="Nama lengkap pengguna">
+                    <input name="name" value="{{ $userFormOld ? old('name') : '' }}" required maxlength="100" autocomplete="name" placeholder="Nama lengkap pengguna">
                 </label>
                 <label>
                     Email
-                    <input type="email" name="email" required maxlength="150" placeholder="email@example.com">
+                    <input type="email" name="email" value="{{ $userFormOld ? old('email') : '' }}" required maxlength="150" autocomplete="email" placeholder="email@example.com">
                 </label>
                 <label>
                     Peran
-                    <select name="role">
-                        <option value="donatur">Donatur</option>
-                        <option value="panti">Pengelola panti</option>
-                        <option value="admin">Admin</option>
+                    <select name="role" id="admin-user-role" required>
+                        <option value="donatur" @selected(($userFormOld ? old('role', 'donatur') : 'donatur') === 'donatur')>Donatur</option>
+                        <option value="panti" @selected(($userFormOld ? old('role', 'donatur') : 'donatur') === 'panti')>Pengelola panti</option>
+                        <option value="admin" @selected(($userFormOld ? old('role', 'donatur') : 'donatur') === 'admin')>Admin</option>
                     </select>
                 </label>
                 <label>
                     Status akun
-                    <select name="status">
-                        <option value="aktif">Aktif</option>
-                        <option value="nonaktif">Nonaktif</option>
+                    <select name="status" required>
+                        <option value="aktif" @selected(($userFormOld ? old('status', 'aktif') : 'aktif') === 'aktif')>Aktif</option>
+                        <option value="nonaktif" @selected(($userFormOld ? old('status', 'aktif') : 'aktif') === 'nonaktif')>Nonaktif</option>
                     </select>
                 </label>
                 <label>
                     Kata sandi
-                    <input type="password" name="password" minlength="8" required placeholder="Minimal 8 karakter">
+                    <input type="password" name="password" minlength="8" required autocomplete="new-password" placeholder="Minimal 8 karakter">
                 </label>
                 <label>
                     Ulangi kata sandi
-                    <input type="password" name="password_confirmation" minlength="8" required placeholder="Ketik ulang kata sandi">
+                    <input type="password" name="password_confirmation" minlength="8" required autocomplete="new-password" placeholder="Ketik ulang kata sandi">
                 </label>
-                <div class="span-two" style="padding:16px;background:#f0fdf4;border-radius:10px;margin-top:8px;">
-                    <strong style="display:block;color:#166534;margin-bottom:8px;font-size:13px;">Isi kolom panti bila peran yang dipilih adalah pengelola panti</strong>
+            </div>
+
+            <fieldset class="user-panti-fields" id="admin-user-panti-fields" @if(!$userFormOld || old('role') !== 'panti') hidden @endif>
+                <legend>Profil panti</legend>
+                <p>Lengkapi data ini untuk membuat akun pengelola panti.</p>
+                <div class="user-create-grid">
+                    <label>
+                        Nama panti
+                        <input name="nama_panti" value="{{ $userFormOld ? old('nama_panti') : '' }}" maxlength="150" data-panti-required placeholder="Nama resmi panti">
+                    </label>
+                    <label>
+                        Kota
+                        <input name="kota" value="{{ $userFormOld ? old('kota') : '' }}" maxlength="100" data-panti-required placeholder="Kota">
+                    </label>
+                    <label class="user-create-field-wide">
+                        Alamat panti
+                        <textarea name="alamat" rows="3" maxlength="3000" data-panti-required placeholder="Alamat lengkap panti">{{ $userFormOld ? old('alamat') : '' }}</textarea>
+                    </label>
+                    <label>
+                        Jumlah anak binaan
+                        <input type="number" name="jumlah_anak" min="0" value="{{ $userFormOld ? old('jumlah_anak', 0) : 0 }}">
+                    </label>
                 </div>
-                <label>
-                    Nama panti
-                    <input name="nama_panti" maxlength="150" placeholder="Nama panti (opsional)">
-                </label>
-                <label>
-                    Kota panti
-                    <input name="kota" maxlength="100" placeholder="Kota (opsional)">
-                </label>
-                <label class="span-two">
-                    Alamat panti
-                    <textarea name="alamat" rows="2" placeholder="Alamat lengkap panti (opsional)"></textarea>
-                </label>
-                <label>
-                    Jumlah anak
-                    <input type="number" name="jumlah_anak" min="0" value="0" placeholder="0">
-                </label>
+            </fieldset>
+
+            <div class="user-create-actions">
+                <button type="button" class="button button-outline button-small" data-user-dialog-close>Batal</button>
+                <button type="submit" class="button button-primary button-small">Simpan pengguna</button>
             </div>
-            <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">
-                <button type="button" onclick="document.getElementById('createUserModal').style.display='none'" class="button button-outline">Batal</button>
-                <button type="submit" class="button button-primary">Simpan pengguna</button>
-            </div>
-        </form>
-    </div>
-</div>
+    </form>
+</dialog>
 
 <form class="filter-row" method="GET">
-    <input name="q" value="{{ request('q') }}" placeholder="Cari nama atau email...">
-    <select name="role">
+    <input type="search" name="q" value="{{ request('q') }}" aria-label="Cari nama atau email" placeholder="Cari nama atau email...">
+    <select name="role" aria-label="Filter berdasarkan peran">
         <option value="">Semua peran</option>
         @foreach(['admin','donatur','panti'] as $role)
             <option value="{{ $role }}" @selected(request('role')===$role)>
@@ -96,7 +115,7 @@
             </option>
         @endforeach
     </select>
-    <button class="button button-outline button-small">Filter</button>
+    <button class="button button-outline button-small" type="submit">Filter</button>
 </form>
 
 <div class="table-card">
@@ -153,3 +172,31 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    const userDialog = document.getElementById('createUserDialog');
+    const userRole = document.getElementById('admin-user-role');
+    const pantiFields = document.getElementById('admin-user-panti-fields');
+
+    function updatePantiFields() {
+        const isPanti = userRole.value === 'panti';
+        pantiFields.hidden = !isPanti;
+        pantiFields.querySelectorAll('[data-panti-required]').forEach((input) => {
+            input.required = isPanti;
+        });
+    }
+
+    document.querySelector('[data-user-dialog-open]').addEventListener('click', () => userDialog.showModal());
+    document.querySelectorAll('[data-user-dialog-close]').forEach((button) => {
+        button.addEventListener('click', () => userDialog.close());
+    });
+    userDialog.addEventListener('click', (event) => {
+        if (event.target === userDialog) userDialog.close();
+    });
+    userRole.addEventListener('change', updatePantiFields);
+    updatePantiFields();
+
+    if (userDialog.hasAttribute('data-reopen')) userDialog.showModal();
+</script>
+@endpush

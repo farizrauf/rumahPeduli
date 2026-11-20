@@ -57,7 +57,7 @@
     </div>
 </div>
 
-<form class="profile-form" method="POST" action="{{ route('panti.profile.update') }}" enctype="multipart/form-data">
+<form class="profile-form panti-profile-form" method="POST" action="{{ route('panti.profile.update') }}" enctype="multipart/form-data">
     @csrf
     @method('PUT')
     
@@ -84,6 +84,11 @@
         
         <label>
             Foto panti
+            @if($panti->foto)
+                <span class="optional">Foto saat ini: <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($panti->foto) }}" target="_blank" rel="noopener">Lihat foto</a>. Unggah file baru untuk menggantinya.</span>
+            @else
+                <span class="optional">Opsional · maks. 5 MB</span>
+            @endif
             <input type="file" name="foto" accept="image/*">
         </label>
         
@@ -94,11 +99,16 @@
         
         <label class="span-two">
             Dokumen legalitas baru <span class="optional">(PDF/JPG/PNG, maks. 5 MB)</span>
+            @if($panti->dokumen)
+                <span class="optional">Dokumen saat ini: <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($panti->dokumen) }}" target="_blank" rel="noopener">Lihat dokumen</a>. Unggah file baru untuk menggantinya.</span>
+            @endif
             <input type="file" name="dokumen" accept=".pdf,image/*">
         </label>
     </div>
     
-    <button class="button button-primary" type="submit">Simpan profil</button>
+    <div class="panti-form-actions">
+        <button class="button button-primary" type="submit">Simpan profil</button>
+    </div>
 </form>
 
 @endsection

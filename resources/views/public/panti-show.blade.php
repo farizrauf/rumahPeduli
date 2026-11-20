@@ -17,7 +17,7 @@
         <div class="panti-detail-grid">
             {{-- Photo --}}
             <div class="panti-detail-photo">
-                <img src="{{ asset('assets/figma/panti-1.jpeg') }}" alt="{{ $panti->nama }}">
+                <img src="{{ $panti->foto ? \Illuminate\Support\Facades\Storage::disk('public')->url($panti->foto) : asset('assets/figma/panti-1.jpeg') }}" alt="{{ $panti->nama }}">
                 <div class="panti-detail-photo-badge">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     {{ $panti->jumlah_anak }} Anak &nbsp;·&nbsp; bertumbuh bersama
@@ -48,7 +48,7 @@
                         Donasi Sekarang
                     </a>
                     @endif
-                    <button class="btn btn-outline" onclick="navigator.share ? navigator.share({title:'{{ $panti->nama }}', url: window.location.href}) : (navigator.clipboard.writeText(window.location.href), alert('Link disalin!'))">
+                    <button class="btn btn-outline" type="button" data-share-title="{{ $panti->nama }}">
                         Bagikan
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                     </button>
@@ -65,6 +65,7 @@
 @php($progress = $campaign->target_dana > 0 ? min(100, round($raised / $campaign->target_dana * 100)) : 0)
 @php($donorCount = $campaign->donasi()->where('status','verified')->count())
 @php($remaining = max(0, $campaign->target_dana - $raised))
+@php($selectedAmount = (int) old('nominal', 100000))
 <section class="donation-section">
     <div class="container">
         <div class="donation-section-header">
@@ -99,27 +100,31 @@
                     <form action="{{ route('donatur.donate.store', $campaign) }}" method="POST" id="donate-form">
                         @csrf
                         <div class="amount-grid">
-                            <button type="button" class="amount-btn" onclick="setAmount(25000)">Rp25.000</button>
-                            <button type="button" class="amount-btn" onclick="setAmount(50000)">Rp50.000</button>
-                            <button type="button" class="amount-btn active" onclick="setAmount(100000)">Rp100.000</button>
-                            <button type="button" class="amount-btn" onclick="setAmount(250000)">Rp250.000</button>
+                            <button type="button" class="amount-btn {{ $selectedAmount === 25000 ? 'active' : '' }}" data-amount="25000" aria-pressed="{{ $selectedAmount === 25000 ? 'true' : 'false' }}">Rp25.000</button>
+                            <button type="button" class="amount-btn {{ $selectedAmount === 50000 ? 'active' : '' }}" data-amount="50000" aria-pressed="{{ $selectedAmount === 50000 ? 'true' : 'false' }}">Rp50.000</button>
+                            <button type="button" class="amount-btn {{ $selectedAmount === 100000 ? 'active' : '' }}" data-amount="100000" aria-pressed="{{ $selectedAmount === 100000 ? 'true' : 'false' }}">Rp100.000</button>
+                            <button type="button" class="amount-btn {{ $selectedAmount === 250000 ? 'active' : '' }}" data-amount="250000" aria-pressed="{{ $selectedAmount === 250000 ? 'true' : 'false' }}">Rp250.000</button>
                         </div>
                         <div class="amount-custom-wrap">
                             <span class="amount-custom-prefix">Rp</span>
-                            <input type="number" name="nominal" id="nominal-input" placeholder="Nominal lainnya" min="1000" required>
+                            <input type="number" name="nominal" id="nominal-input" value="{{ old('nominal', 100000) }}" placeholder="Nominal lainnya" min="1000" step="1" inputmode="numeric" aria-describedby="@error('nominal') panti-donate-nominal-error @enderror" required>
                         </div>
+                        @error('nominal')
+                            <small class="field-error" id="panti-donate-nominal-error">{{ $message }}</small>
+                        @enderror
                         <div class="auth-form-group" style="margin-top:8px">
-                            <label style="font-size:11px;font-weight:700;color:var(--teal)">Metode Pembayaran</label>
-                            <select name="metode" required>
+                            <label for="panti-donate-method" style="font-size:11px;font-weight:700;color:var(--teal)">Metode Pembayaran</label>
+                            <select id="panti-donate-method" name="metode" aria-describedby="@error('metode') panti-donate-method-error @enderror" required>
                                 <option value="">Pilih metode...</option>
-                                <option value="Transfer BCA">Transfer BCA</option>
-                                <option value="Transfer BNI">Transfer BNI</option>
-                                <option value="Transfer Mandiri">Transfer Mandiri</option>
-                                <option value="QRIS">QRIS</option>
-                                <option value="GoPay">GoPay</option>
-                                <option value="OVO">OVO</option>
+                                <option value="Transfer BCA" @selected(old('metode') === 'Transfer BCA')>Transfer BCA</option>
+                                <option value="Transfer Mandiri" @selected(old('metode') === 'Transfer Mandiri')>Transfer Mandiri</option>
+                                <option value="QRIS" @selected(old('metode') === 'QRIS')>QRIS</option>
+                                <option value="GoPay" @selected(old('metode') === 'GoPay')>GoPay</option>
                             </select>
                         </div>
+                        @error('metode')
+                            <small class="field-error" id="panti-donate-method-error">{{ $message }}</small>
+                        @enderror
                         <button class="btn btn-primary btn-wide" type="submit" style="border-radius:12px">
                             Lanjutkan Donasi
                         </button>
@@ -249,11 +254,47 @@ function setAmount(amount) {
     const input = document.getElementById('nominal-input');
     if (input) {
         input.value = amount;
-        document.querySelectorAll('.amount-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.textContent.includes(new Intl.NumberFormat('id').format(amount)));
+        document.querySelectorAll('.amount-btn[data-amount]').forEach(btn => {
+            const isSelected = Number(btn.dataset.amount) === Number(amount);
+            btn.classList.toggle('active', isSelected);
+            btn.setAttribute('aria-pressed', String(isSelected));
         });
     }
 }
+
+document.querySelector('[data-share-title]')?.addEventListener('click', async (event) => {
+    const button = event.currentTarget;
+    const shareData = { title: button.dataset.shareTitle, url: window.location.href };
+
+    if (navigator.share) {
+        try {
+            await navigator.share(shareData);
+            return;
+        } catch (error) {
+            if (error.name === 'AbortError') return;
+        }
+    }
+
+    try {
+        await navigator.clipboard.writeText(shareData.url);
+        alert('Tautan panti berhasil disalin.');
+    } catch (error) {
+        window.prompt('Salin tautan panti ini:', shareData.url);
+    }
+});
+
+document.querySelectorAll('.amount-btn[data-amount]').forEach((button) => {
+    button.addEventListener('click', () => setAmount(button.dataset.amount));
+});
+
+document.getElementById('nominal-input')?.addEventListener('input', (event) => {
+    const amount = Number(event.currentTarget.value);
+    document.querySelectorAll('.amount-btn[data-amount]').forEach((button) => {
+        const isSelected = Number(button.dataset.amount) === amount;
+        button.classList.toggle('active', isSelected);
+        button.setAttribute('aria-pressed', String(isSelected));
+    });
+});
 </script>
 @endpush
 @endsection

@@ -33,7 +33,9 @@ class AuthController extends Controller
         ], $request->boolean('remember'));
 
         if (! $berhasil) {
-            return back()->withErrors(['email' => 'Email atau kata sandi tidak sesuai.'])->onlyInput('email');
+            return back()
+                ->withErrors(['email' => 'Email atau kata sandi tidak sesuai.'])
+                ->withInput($request->only('email', 'remember'));
         }
 
         $request->session()->regenerate();

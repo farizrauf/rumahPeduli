@@ -52,7 +52,16 @@
             @endif
         </div>
         <h3 class="modal-notif-title">{{$notifTitle}}</h3>
-        <p class="modal-notif-message">{{$notifMessage}}</p>
+        @if ($notifType === 'error' && $errors->any())
+            <p class="modal-notif-message">Beberapa kolom perlu diperiksa:</p>
+            <ul class="modal-notif-errors">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        @else
+            <p class="modal-notif-message">{{$notifMessage}}</p>
+        @endif
         <button type="button" class="modal-notif-btn modal-notif-btn-{{$notifType}}" onclick="closeModalNotif();">OK</button>
     </div>
 </div>

@@ -18,38 +18,35 @@
             <h1 class="auth-title-split">Selamat Datang Kembali</h1>
             <p class="auth-subtitle-split">Masuk untuk melanjutkan kebaikan bersama</p>
 
-            <!-- {{-- Divider --}}
-            <div class="auth-or-divider">
-                <span>Atau</span>
-            </div> -->
-
-            {{-- Alerts --}}
             @if ($errors->any())
-                <div class="auth-alert-split error">{{ $errors->first() }}</div>
+                <div class="auth-alert-split error" role="alert" aria-live="polite">{{ $errors->first() }}</div>
             @endif
             @if (session('success'))
-                <div class="auth-alert-split success">{{ session('success') }}</div>
+                <div class="auth-alert-split success" role="status">{{ session('success') }}</div>
             @endif
 
-            {{-- Form --}}
             <form method="POST" action="{{ route('login.store') }}" class="auth-form-split">
                 @csrf
 
                 <div class="form-field-split">
-                    <label>Email</label>
+                    <label for="login-email">Email</label>
                     <input
+                        id="login-email"
                         type="email"
                         name="email"
                         value="{{ old('email') }}"
                         placeholder="nama@email.com"
                         autocomplete="email"
+                        aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}"
+                        aria-describedby="@error('email') login-email-error @enderror"
                         required
                         autofocus
                     >
+                    @error('email')<small class="field-error" id="login-email-error">{{ $message }}</small>@enderror
                 </div>
 
                 <div class="form-field-split">
-                    <label>Kata Sandi</label>
+                    <label for="password-field">Kata sandi</label>
                     <div class="input-with-toggle">
                         <input
                             type="password"
@@ -57,23 +54,26 @@
                             id="password-field"
                             placeholder="••••••••••"
                             autocomplete="current-password"
+                            aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
+                            aria-describedby="@error('password') login-password-error @enderror"
                             required
                         >
-                        <button type="button" class="password-toggle" onclick="togglePass('password-field')">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <button type="button" class="password-toggle" data-password-toggle="password-field" aria-label="Tampilkan kata sandi">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                 <circle cx="12" cy="12" r="3"/>
                             </svg>
                         </button>
                     </div>
+                    @error('password')<small class="field-error" id="login-password-error">{{ $message }}</small>@enderror
                 </div>
 
                 <div class="form-row-split">
                     <label class="checkbox-split">
-                        <input type="checkbox" name="remember" value="1">
+                        <input type="checkbox" name="remember" value="1" @checked(old('remember'))>
                         <span>Ingat saya</span>
                     </label>
-                    <a href="#" class="link-forgot-split">Lupa kata sandi?</a>
+                    <a href="mailto:halo@rumahpeduli.id?subject=Bantuan%20akses%20akun" class="link-forgot-split">Butuh bantuan masuk?</a>
                 </div>
 
                 <button type="submit" class="btn-submit-split">Masuk</button>
@@ -124,11 +124,17 @@
 
 </section>
 
-<script>
-function togglePass(id) {
-    const input = document.getElementById(id);
-    input.type = input.type === 'password' ? 'text' : 'password';
-}
-</script>
-
 @endsection
+
+@push('scripts')
+<script>
+    document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const input = document.getElementById(button.dataset.passwordToggle);
+            const isVisible = input.type === 'password';
+            input.type = isVisible ? 'text' : 'password';
+            button.setAttribute('aria-label', isVisible ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
+        });
+    });
+</script>
+@endpush

@@ -15,7 +15,7 @@
 </div>
 
 <form class="filter-row" method="GET">
-    <select name="status">
+    <select name="status" aria-label="Filter donasi berdasarkan status">
         <option value="">Semua status</option>
         @foreach(['pending','verified','rejected'] as $status)
             <option value="{{ $status }}" @selected(request('status')===$status)>
@@ -23,7 +23,7 @@
             </option>
         @endforeach
     </select>
-    <button class="button button-outline button-small">Filter</button>
+    <button class="button button-outline button-small" type="submit">Filter</button>
 </form>
 
 <div class="table-card">
@@ -63,8 +63,8 @@
                         <span class="muted">Tidak dilampirkan</span>
                     @endif
                 </td>
-                <td>
-                    <div style="display:flex;flex-direction:column;gap:8px;">
+                <td class="review-action-cell">
+                    <div class="verification-status-stack">
                         <span class="status-badge status-{{ $item->status }}">
                             {{ ucfirst($item->status) }}
                         </span>
@@ -73,14 +73,18 @@
                                 <form class="verify-form" method="POST" action="{{ route('admin.donations.verify',$item) }}">
                                     @csrf
                                     <input type="hidden" name="status" value="verified">
-                                    <button class="table-action action-success">Verifikasi</button>
+                                    <button class="table-action action-success" type="submit">Verifikasi</button>
                                 </form>
-                                <form class="verify-form" method="POST" action="{{ route('admin.donations.verify',$item) }}">
-                                    @csrf
-                                    <input type="hidden" name="status" value="rejected">
-                                    <input name="catatan_admin" placeholder="Alasan penolakan" style="width:160px;">
-                                    <button class="table-action action-danger">Tolak</button>
-                                </form>
+                                <details class="review-reject-details">
+                                    <summary class="table-action action-danger">Tolak</summary>
+                                    <form class="review-reject-form" method="POST" action="{{ route('admin.donations.verify',$item) }}">
+                                        @csrf
+                                        <input type="hidden" name="status" value="rejected">
+                                        <label for="donation-reason-{{ $item->id }}">Alasan penolakan <span>(opsional)</span></label>
+                                        <input id="donation-reason-{{ $item->id }}" name="catatan_admin" maxlength="255" placeholder="Tulis alasan">
+                                        <button class="table-action action-danger" type="submit">Konfirmasi penolakan</button>
+                                    </form>
+                                </details>
                             </div>
                         @elseif($item->catatan_admin)
                             <small style="color:#6b7280;">{{ $item->catatan_admin }}</small>
