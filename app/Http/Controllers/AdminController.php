@@ -10,6 +10,7 @@ use App\Models\Pengeluaran;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -113,6 +114,21 @@ class AdminController extends Controller
         $donations = $donations->latest()->paginate(12)->withQueryString();
 
         return view('admin.donations', compact('donations'));
+    }
+
+    public function donationProof(Donasi $donasi)
+    {
+        abort_unless(
+            $donasi->bukti && Storage::disk('public')->exists($donasi->bukti),
+            404
+        );
+
+        return Storage::disk('public')->response(
+            $donasi->bukti,
+            basename($donasi->bukti),
+            [],
+            'inline'
+        );
     }
 
     public function verifyDonation(Request $request, Donasi $donasi)

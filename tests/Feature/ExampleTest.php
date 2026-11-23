@@ -6,8 +6,10 @@ use App\Models\Donasi;
 use App\Models\Kampanye;
 use App\Models\Kebutuhan;
 use App\Models\Panti;
+use App\Models\Pengeluaran;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
@@ -130,6 +132,68 @@ class ExampleTest extends TestCase
         $this->get(route('admin.reports'))->assertOk()->assertSee('250.000');
         $this->get(route('reports.index'))->assertOk()->assertSee('250.000');
         $this->get(route('admin.audit'))->assertOk()->assertSee('donasi');
+    }
+
+    public function test_transparency_cards_sum_verified_donations_and_expenses_per_panti(): void
+    {
+        $panti = $this->createVerifiedPanti();
+        $firstCampaign = $this->createActiveCampaign($panti);
+        $secondCampaign = $this->createActiveCampaign($panti);
+        $donor = User::factory()->create();
+
+        foreach ([$firstCampaign, $secondCampaign] as $index => $campaign) {
+            Donasi::create([
+                'user_id' => $donor->id,
+                'kampanye_id' => $campaign->id,
+                'kode_transaksi' => 'TRX-REPORT-000' . ($index + 1),
+                'nominal' => 50000,
+                'metode' => 'QRIS',
+                'status' => 'verified',
+            ]);
+
+            Pengeluaran::create([
+                'panti_id' => $panti->id,
+                'kampanye_id' => $campaign->id,
+                'keterangan' => 'Penyaluran contoh ' . ($index + 1),
+                'nominal' => 20000,
+                'tanggal' => now()->toDateString(),
+                'status' => 'verified',
+            ]);
+        }
+
+        $response = $this->get(route('reports.index'))->assertOk();
+
+        $this->assertStringContainsString('Rp 100.000</span>', $response->getContent());
+        $this->assertStringContainsString('Rp 40.000</span>', $response->getContent());
+        $response->assertSee('40% tersalurkan');
+    }
+
+    public function test_admin_can_open_a_donation_proof_from_the_application_route(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('bukti-donasi/test-proof.png', 'proof');
+
+        $admin = User::factory()->create(['role' => 'admin']);
+        $donor = User::factory()->create();
+        $campaign = $this->createActiveCampaign($this->createVerifiedPanti());
+        $donation = Donasi::create([
+            'user_id' => $donor->id,
+            'kampanye_id' => $campaign->id,
+            'kode_transaksi' => 'TRX-PROOF-0001',
+            'nominal' => 25000,
+            'metode' => 'Transfer BCA',
+            'bukti' => 'bukti-donasi/test-proof.png',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.donations.proof', $donation))
+            ->assertOk()
+            ->assertHeader('content-type', 'image/png')
+            ->assertHeader('content-disposition', 'inline; filename=test-proof.png');
+
+        $this->actingAs($donor)
+            ->get(route('admin.donations.proof', $donation))
+            ->assertForbidden();
     }
 
     public function test_admin_can_verify_a_panti_and_only_verified_panti_are_public(): void

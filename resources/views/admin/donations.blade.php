@@ -56,7 +56,7 @@
                 </td>
                 <td>
                     @if($item->bukti)
-                        <a class="table-action" href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($item->bukti) }}" target="_blank" rel="noopener">
+                        <a class="table-action" href="{{ route('admin.donations.proof', $item) }}" target="_blank" rel="noopener">
                             Lihat bukti
                         </a>
                     @else

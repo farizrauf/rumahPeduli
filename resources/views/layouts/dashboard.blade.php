@@ -120,8 +120,6 @@
     </section>
 </div>
 
-<x-modal-notification />
-
 @push('scripts')
 <script>
     const dashboardToggle = document.querySelector('.dashboard-menu-toggle');

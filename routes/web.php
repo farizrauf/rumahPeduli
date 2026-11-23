@@ -52,6 +52,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/panti/{id}/restore', [AdminController::class, 'restorePanti'])->name('panti.restore');
     Route::get('/kampanye', [AdminController::class, 'campaigns'])->name('campaigns');
     Route::get('/donasi', [AdminController::class, 'donations'])->name('donations');
+    Route::get('/donasi/{donasi}/bukti', [AdminController::class, 'donationProof'])->name('donations.proof');
     Route::post('/donasi/{donasi}/verifikasi', [AdminController::class, 'verifyDonation'])->name('donations.verify');
     Route::get('/pengeluaran', [AdminController::class, 'expenses'])->name('expenses');
     Route::post('/pengeluaran/{pengeluaran}/verifikasi', [AdminController::class, 'verifyExpense'])->name('expenses.verify');
